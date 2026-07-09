@@ -19,14 +19,18 @@ class SSHClient:
                 port=self.port,
                 username=self.username,
                 password=self.password,
-                timeout=10,
-                banner_timeout=10,
-                auth_timeout=10,
+                timeout=5,
+                banner_timeout=5,
+                auth_timeout=5,
                 look_for_keys=False,
                 allow_agent=False,
             )
 
-            stdin, stdout, stderr = client.exec_command(command, timeout=timeout)
+            stdin, stdout, stderr = client.exec_command(
+                command,
+                timeout=timeout,
+                get_pty=False,
+            )
 
             out = stdout.read().decode(errors="ignore")
             err = stderr.read().decode(errors="ignore")
