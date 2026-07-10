@@ -27,6 +27,7 @@ from app.validators import is_valid_ip
 from app.ssh_client import SSHClient
 from app.logger import setup_logger
 from app.report_writer import ReportWriter
+from PySide6.QtGui import QIcon
 
 
 class MainWindow(QMainWindow):
@@ -52,7 +53,8 @@ class MainWindow(QMainWindow):
         self.history_db = HistoryDatabase()
         self.report_writer = ReportWriter()
 
-        self.setWindowTitle("LibreNMS Device Manager")
+        self.setWindowTitle("Network Automation Manager")
+        self.setWindowIcon(QIcon("icons/app_icon.ico"))
         self.resize(950, 700)
 
         self.tabs = QTabWidget()
@@ -272,7 +274,14 @@ class MainWindow(QMainWindow):
                 continue
 
             self.append_log(f"MikroTik: {ip}")
-            self.append_log(f"COMMAND: {command}")
+            safe_log = MikroTikService.build_safe_log_message(
+                action=action,
+                username=target_username,
+                group=group,
+                allowed_address=allowed_address,
+            )
+
+            self.append_log(safe_log)
 
             ssh = SSHClient(ip, int(ssh_port), ssh_username, ssh_password)
             code, out, err = ssh.run_command(command, timeout=10)
